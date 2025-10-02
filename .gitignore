@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database file - IMPORTANT!
+# Users should generate their own empty database.
+database/investment_tracker.db
+
+# IDE/Editor specific files
+.vscode/
+.idea/

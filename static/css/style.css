@@ -1,0 +1,499 @@
+/* static/css/style.css */
+
+/* General Body and Typography */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; 
+    color: #343a40; 
+    line-height: 1.6;
+    font-size: 16px; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #212529; 
+    margin-top: 1.8em; 
+    margin-bottom: 0.8em; 
+    font-weight: 500; 
+}
+
+h1 { font-size: 2.2em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.6em; }
+h4 { font-size: 1.3em; }
+h5 { font-size: 1.1em; }
+h6 { font-size: 0.95em; }
+
+p {
+    margin-bottom: 1.2em;
+    color: #495057; 
+}
+
+a {
+    color: #007bff; 
+    text-decoration: none;
+}
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #e9ecef; 
+    margin: 30px 0; 
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+/* Layout */
+.content {
+    width: 90%; 
+    max-width: 1600px; 
+    margin: 30px auto; 
+    padding: 30px;    
+    background-color: #ffffff;
+    border-radius: 12px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07); 
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 25px;
+    background-color: #343a40; 
+    color: #f8f9fa;
+}
+
+/* Navigation */
+nav {
+    background-color: #343a40; 
+    color: #ffffff;
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}
+nav ul { list-style-type: none; padding: 0; margin: 0; }
+nav ul li { display: inline; margin: 0 15px; } 
+nav ul li:last-child { 
+    margin-right: 0;
+}
+nav ul li a { color: #ffffff; font-weight: 500; letter-spacing: 0.5px; }
+nav ul li a:hover { color: #adb5bd; text-decoration: none;}
+
+/* Forms */
+form div {
+    margin-bottom: 18px; 
+}
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500; 
+    font-size: 0.95em;
+    color: #495057;
+}
+input[type="text"],
+input[type="number"],
+input[type="email"], 
+input[type="password"], 
+select,
+textarea { 
+    width: 100%; 
+    padding: 12px 15px; 
+    border: 1px solid #ced4da; 
+    border-radius: 6px; 
+    box-sizing: border-box; 
+    background-color: #fdfdfe; 
+    color: #495057;
+    font-size: 1em;
+}
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus, 
+input[type="password"]:focus, 
+select:focus,
+textarea:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+input[type="number"].default-width { 
+    width: auto; 
+}
+
+/* General Submit Buttons */
+button[type="submit"],
+input[type="submit"] { 
+    background-color: #007bff; 
+    color: white;
+    padding: 12px 20px; 
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background-color 0.15s ease-in-out;
+}
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+    background-color: #0056b3; 
+}
+
+/* Base for link-styled buttons to override default <a> tag styles */
+.button-link, /* General class if you want to apply to non-specific <a> */
+a.button-link-edit, a.button-link-edit-small, 
+a.button-link-delete, 
+a.button-link-refresh,
+a.button-link-simulate, a.button-link-simulate-buy,
+a.button-link-manage-assets,
+a.button-link-cancel {
+    display: inline-block;
+    padding: 6px 12px; 
+    text-decoration: none !important; /* Force no underline */
+    border-radius: 6px;
+    margin-right: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid transparent; 
+    margin-bottom: 5px; 
+    transition: opacity 0.15s ease-in-out, background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+a.button-link-edit:hover, a.button-link-edit-small:hover,
+a.button-link-delete:hover, 
+a.button-link-refresh:hover,
+a.button-link-simulate:hover, a.button-link-simulate-buy:hover,
+a.button-link-manage-assets:hover,
+a.button-link-cancel:hover {
+    opacity: 0.85;
+    text-decoration: none !important;
+}
+
+/* Specific colors for button-like links (applied to <a> tags) */
+a.button-link-edit, a.button-link-edit:visited, a.button-link-edit:link,
+a.button-link-edit-small, a.button-link-edit-small:visited, a.button-link-edit-small:link { 
+    background-color: #ffc107; border-color: #dda600; color:#212529 !important;
+} 
+a.button-link-edit:hover, a.button-link-edit-small:hover { background-color: #e0a800; }
+
+a.button-link-delete, a.button-link-delete:visited, a.button-link-delete:link { 
+    background-color: #dc3545; border-color: #dc3545; color: white !important; 
+}
+a.button-link-delete:hover { background-color: #c82333; }
+
+a.button-link-refresh, button.button-link-refresh, /* Also style button elements with this class */
+a.button-link-refresh:visited, a.button-link-refresh:link { 
+    background-color: #17a2b8; border-color: #17a2b8; color: white !important; 
+}
+a.button-link-refresh:hover, button.button-link-refresh:hover { background-color: #117a8b; }
+
+a.button-link-simulate, button.button-link-simulate,
+a.button-link-simulate:visited, a.button-link-simulate:link { 
+    background-color: #6f42c1; border-color: #6f42c1; color: white !important; 
+}
+a.button-link-simulate:hover, button.button-link-simulate:hover { background-color: #593695; } 
+
+a.button-link-simulate-buy, button.button-link-simulate-buy,
+a.button-link-simulate-buy:visited, a.button-link-simulate-buy:link { 
+    background-color: #fd7e14; border-color: #fd7e14; color: white !important; 
+} 
+a.button-link-simulate-buy:hover, button.button-link-simulate-buy:hover { background-color: #e6690b; } 
+
+a.button-link-manage-assets, a.button-link-manage-assets:visited, a.button-link-manage-assets:link { 
+    background-color: #6c757d; border-color: #6c757d; color: white !important; font-size:0.8em; padding: 4px 8px;
+}
+a.button-link-manage-assets:hover { background-color: #5a6268; }
+
+a.button-link-cancel, button.button-link-cancel,
+a.button-link-cancel:visited, a.button-link-cancel:link { 
+    background-color: #f8f9fa; color: #343a40 !important; border-color: #ced4da;
+}
+a.button-link-cancel:hover, button.button-link-cancel:hover { background-color: #e2e6ea; }
+
+/* Ensure .button-link-edit-small specific size */
+a.button-link-edit-small, a.button-link-edit-small:visited, a.button-link-edit-small:link {
+    padding: 2px 6px !important; /* Ensure small padding */
+    font-size: 0.8em !important; /* Ensure small font */
+}
+
+
+/* Actions Dropdown Styles */
+.actions-cell {
+    position: relative; 
+    text-align: left; /* Align button to left, dropdown can go right */
+}
+
+.actions-dropdown {
+    display: inline-block; 
+    position: relative;
+}
+
+.actions-dropdown-btn {
+    background-color: #6c757d; 
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.actions-dropdown-btn:hover {
+    background-color: #5a6268;
+}
+
+.actions-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 180px; 
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 100; 
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    right: 0; 
+    margin-top: 2px; 
+}
+
+.actions-dropdown-content .dropdown-item {
+    color: #343a40;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9em;
+    box-sizing: border-box; 
+}
+.actions-dropdown-content .dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+.actions-dropdown-content .dropdown-form {
+    margin: 0;
+    padding: 0;
+    display: block; 
+}
+.actions-dropdown-content .dropdown-item.delete-item {
+    color: #dc3545; 
+}
+.actions-dropdown-content .dropdown-item.delete-item:hover {
+    background-color: #f8d7da; 
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: separate; 
+    border-spacing: 0;      
+    margin-top: 20px;
+    margin-bottom: 25px; 
+    border: 1px solid #dee2e6;
+    border-radius: 8px; 
+    font-size: 0.95em; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+table th, table td {
+    border-bottom: 1px solid #dee2e6; 
+    border-right: 1px solid #dee2e6; 
+    padding: 10px 12px; 
+    text-align: left;
+    vertical-align: middle; 
+}
+table th:first-child, table td:first-child { border-left: 0; }
+table th:last-child, table td:last-child { border-right: 0; }
+table tr:last-child td { border-bottom: 0; }
+
+table th {
+    background-color: #f8f9fa; 
+    font-weight: 500; 
+    white-space: nowrap;
+    color: #495057;
+    padding: 12px 12px; 
+}
+table tr:nth-child(even) td { 
+    background-color: #fcfdff; 
+}
+table tr:hover td {
+    background-color: #e9ecef; 
+}
+
+.assets-table td.is-numeric,
+.ranked-assets-table td.is-numeric,
+.ranked-accounts-table td.is-numeric,
+p.is-numeric { 
+    font-weight: 500; 
+}
+
+.assets-table th, .assets-table td { } 
+.ranked-assets-table { margin-bottom: 30px; }
+.ranked-accounts-table { margin-bottom: 30px; } 
+
+
+/* Flash Messages */
+.flashes { list-style-type: none; padding: 0; margin-bottom: 1.5em; }
+.flashes li {
+    padding: 1em 1.5em; 
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .3rem; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.flashes li.success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
+.flashes li.error   { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
+.flashes li.warning { background-color: #fff3cd; color: #664d03; border-color: #ffecb5; }
+.flashes li.info    { background-color: #cff4fc; color: #055160; border-color: #bee5eb; }
+
+/* Dashboard Specific Styles */
+.dashboard-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px; 
+    margin-bottom: 25px;
+}
+.summary-card {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef; 
+    border-radius: 10px; 
+    padding: 20px; 
+    flex: 1 1 220px; 
+    min-width: 180px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.summary-card h4 {
+    margin-top: 0;
+    color: #555;
+    font-size: 0.95em; 
+    font-weight: 500;
+    margin-bottom: 0.7em; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+.summary-card p {
+    font-size: 1.8em; 
+    font-weight: 600; 
+    margin-bottom: 0;
+    color: #212529;
+}
+.summary-card-total p { color: #0062cc; }
+.profit { color: #198754 !important; } 
+.loss   { color: #dc3545 !important; }
+
+/* Dashboard Breakdown Sections */
+.user-breakdown { margin-bottom: 35px; padding: 25px; background-color: #f0f2f5; border-radius: 10px; }
+.user-breakdown h3 { margin-top: 0; border-bottom: 1px solid #d8dde2; padding-bottom: 12px; margin-bottom: 20px; font-size: 1.4em;}
+.platform-breakdown { margin-top: 25px; margin-bottom: 25px; padding: 20px; background-color: #f8f9fc; border: 1px solid #e0e5eb; border-radius: 8px; }
+.platform-breakdown h4 { margin-top: 0; font-size: 1.25em; color: #495057; margin-bottom: 15px; }
+.account-breakdown { margin-top: 20px; padding: 20px; background-color: #ffffff; border: 1px solid #d1d9e1; border-radius: 6px; margin-left: 0px; }
+.account-breakdown h5 { margin-top: 0; font-size: 1.15em; color: #343a40; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.dashboard-summary-platform .summary-card { flex-basis: 190px; padding: 12px; }
+.dashboard-summary-platform .summary-card h5 { font-size: 0.85em; margin-bottom: 5px; color: #6c757d; font-weight: 500; text-transform: none; letter-spacing: 0;}
+.dashboard-summary-platform .summary-card p { font-size: 1.3em; }
+.user-separator { margin-top: 35px; margin-bottom: 35px; border-color: #ced4da; }
+
+/* Goal Form & Tracker Section */
+.goal-form { margin-bottom: 15px; }
+.goal-form div { margin-bottom: 12px; }
+.goal-form label { display: block; margin-bottom: 6px; font-weight: 500; }
+.goal-form input[type="number"] { padding: 10px; width: 100%; box-sizing: border-box; }
+.goal-form button[type="submit"] { padding: 10px 18px; margin-top: 8px; }
+
+.dashboard-goal-section { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; margin-bottom: 30px; }
+.goal-tracker-container { flex: 1 1 400px; min-width: 300px; text-align: center;} 
+.goal-tracker-container h3 { margin-top:0; text-align: center; font-size: 1.4em; margin-bottom: 10px;}
+.set-goal-container { flex: 1 1 300px; padding-left: 20px; min-width: 280px; }
+.set-goal-container h3 { margin-top:0; font-size: 1.4em; margin-bottom: 15px; }
+
+/* Best/Worst Performer Cards Specifics */
+.performer-cards-container .summary-card { 
+    min-height: 220px; 
+}
+.best-performer { background-color: #e6ffed; border-left: 5px solid #198754; }
+.worst-performer { background-color: #ffebee; border-left: 5px solid #dc3545; }
+.best-performer p, .worst-performer p { font-size: 0.9em; margin: 4px 0; }
+.best-performer p strong, .worst-performer p strong { font-size: 1.15em; }
+.performer-card-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px; }
+.performer-column-left, .performer-column-right { flex: 1; box-sizing: border-box; padding: 0 5px; min-width: 150px; }
+.performer-column-right { padding-left: 10px; }
+.performer-card-content p { font-size: 0.9em; margin: 3px 0; }
+#best_performer_chart_div, #worst_performer_chart_div { clear: both; height: 80px !important;  margin-top: 5px;}
+
+
+/* Chart Containers */
+.charts-row-container { display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 25px; }
+.chart-column { flex: 1 1 calc(50% - 12.5px); min-width: 320px; background-color: #fff; padding: 15px; border-radius:8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.chart-column h2 { margin-top: 0; font-size: 1.3em; text-align: center; margin-bottom: 15px; }
+
+/* Simulation Forms */
+.simulation-form-container { margin-top:10px; padding:15px; border:1px solid #e0e5eb; background-color: #f8f9fc; border-radius: 6px; clear: both; }
+.simulation-form-container h5 { margin-top: 0; margin-bottom: 12px; font-size: 1.05em; }
+.simulation-form-container label { font-size: 0.9em; }
+.simulation-form-container input[type="number"] { margin-bottom: 12px; width: 100%;}
+.simulation-form-container button[type="submit"] { font-size: 0.9em; padding: 8px 12px; margin-top: 8px; }
+.simulation-result p { font-size: 0.95em; margin: 6px 0; }
+.simulation-result hr { margin: 10px 0; }
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) { 
+    .charts-row-container {
+        flex-direction: column;
+    }
+    .chart-column {
+        flex-basis: auto; 
+        width: 100%;
+        margin-bottom: 25px; 
+    }
+     .chart-column:last-child { margin-bottom: 0; }
+}
+
+@media (max-width: 768px) {
+    .content { width: 95%; padding: 15px; }
+    nav ul li { display: block; margin-right: 0; margin-bottom: 10px; }
+    nav ul li:last-child { margin-bottom: 0; }
+    .dashboard-goal-section { flex-direction: column; }
+    .set-goal-container { padding-left: 0; margin-top: 20px; }
+    .goal-tracker-container #goal_gauge_chart, 
+    .goal-tracker-container div[style*="width: 400px"] { max-width: 100% !important; width: auto !important; }
+    .summary-card { min-width: calc(50% - 10px); } 
+    .summary-card.summary-card-total,
+    .summary-card.user-worth-card,
+    .summary-card.user-invested-card { min-width: 100%; } 
+}
+
+@media (max-width: 480px) {
+    .summary-card { min-width: 100%; } 
+    .performer-card-content { flex-direction: column; } 
+    .performer-column-right { padding-left: 5px; margin-top: 10px; }
+}
+
+
+/* Sortable Tables */
+th.sortable {
+    cursor: pointer;
+    position: relative; /* For arrow positioning */
+}
+th.sortable:hover {
+    background-color: #dde2e6; /* Slightly darker on hover */
+}
+.sort-arrow {
+    font-size: 0.8em;
+    margin-left: 5px;
+    /* position: absolute; /* Optional: if you want to fine-tune arrow position */
+    /* right: 5px; */
+    /* top: 50%; */
+    /* transform: translateY(-50%); */
+}

@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }} - Investment Tracker
+{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <h3>Add New Platform</h3>
+    <form method="POST" action="{{ url_for('manage_platforms') }}">
+        <div>
+            <label for="name">Platform Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <button type="submit">Add Platform</button>
+    </form>
+
+    <hr>
+
+    <h3>Existing Platforms</h3>
+    {% if platforms %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Platform ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for platform in platforms %}
+                    <tr>
+                        <td>{{ platform['platform_id'] }}</td>
+                        <td>{{ platform['name'] }}</td>
+                        <td class="actions-cell">
+                            <a href="{{ url_for('edit_platform', platform_id=platform['platform_id']) }}" class="button-link-edit">Edit</a>
+                            <form method="POST" action="{{ url_for('delete_platform', platform_id=platform['platform_id']) }}" style="display: inline;">
+                                <button type="submit" class="button-link-delete" 
+                                        data-platform-name="{{ platform['name'] | escape }}"
+                                        onclick="return confirm('Are you sure you want to delete the platform \'' + this.getAttribute('data-platform-name') + '\'? All associated accounts and their assets will also be PERMANENTLY deleted. This action cannot be undone.');">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No platforms found. Add one above!</p>
+    {% endif %}
+{% endblock %}

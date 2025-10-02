@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }} - Investment Tracker
+{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    {% if asset %}
+        <p><strong>Account:</strong> {{ asset['account_name'] }}</p>
+        <p><a href="{{ url_for('manage_account_assets', account_id=asset['account_id']) }}">&laquo; Back to Assets in this Account</a></p>
+        <hr>
+        
+        <h3>Edit Manually Entered Details:</h3>
+        <form method="POST" action="{{ url_for('edit_asset', asset_id=asset['asset_id']) }}">
+            <div>
+                <label for="ticker_symbol">Ticker Symbol:</label>
+                <input type="text" id="ticker_symbol" name="ticker_symbol" value="{{ asset['ticker_symbol'] }}" required>
+            </div>
+            <div>
+                <label for="asset_name">Asset Name (Manual - overrides fetched name if set):</label>
+                <input type="text" id="asset_name" name="asset_name" value="{{ asset['name'] if asset['name'] is not none else '' }}">
+            </div>
+            <div>
+                <label for="quantity">Quantity:</label>
+                <input type="number" step="any" id="quantity" name="quantity" value="{{ asset['quantity'] }}" required>
+            </div>
+            <div>
+                <label for="average_cost">Average Cost (per unit):</label>
+                {# For input, we use the raw number, possibly formatted to a fixed number of decimals if desired, but without currency symbols/commas #}
+                <input type="number" step="any" id="average_cost" name="average_cost" value="{{ '%.8f'|format(asset['average_cost']|float) if asset['average_cost'] is not none else '' }}" required>
+            </div>
+            <div>
+                <label for="total_invested">Total Invested Amount:</label>
+                {# For input, we use the raw number #}
+                <input type="number" step="any" id="total_invested" name="total_invested" value="{{ '%.2f'|format(asset['total_invested']|float) if asset['total_invested'] is not none else '' }}" required>
+            </div>
+            <!-- 
+            If you add a 'notes' field to your assets table and want to edit it:
+            <div>
+                <label for="notes">Notes (Optional):</label>
+                <textarea id="notes" name="notes" rows="3">{{ asset['notes'] if asset['notes'] is not none else '' }}</textarea>
+            </div>
+            -->
+            <div>
+                <button type="submit">Save Manual Changes</button>
+                <a href="{{ url_for('manage_account_assets', account_id=asset['account_id']) }}" class="button-link-cancel">Cancel</a>
+            </div>
+        </form>
+        
+        <hr>
+        <h3>Last Fetched Market Data (Read-Only):</h3>
+        <p><strong>Current Price:</strong> {{ asset['current_price'] | currency if asset['current_price'] is not none else 'N/A' }}</p>
+        <p><strong>Previous Close:</strong> {{ asset['price_yesterday'] | currency if asset['price_yesterday'] is not none else 'N/A' }}</p>
+        <p><strong>52-Week High:</strong> {{ asset['fifty_two_week_high'] | currency if asset['fifty_two_week_high'] is not none else 'N/A' }}</p>
+        <p><strong>52-Week Low:</strong> {{ asset['fifty_two_week_low'] | currency if asset['fifty_two_week_low'] is not none else 'N/A' }}</p>
+        <p><em>To update this market data, use the "Refresh Data" button on the asset list page.</em></p>
+
+    {% else %}
+        <p>Asset not found. <a href="{{ url_for('manage_accounts') }}">Return to Accounts List</a>.</p>
+    {% endif %}
+{% endblock %}

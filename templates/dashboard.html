@@ -1,0 +1,674 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }} - Investment Tracker
+{% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <p style="margin: 0;">Welcome to your investment tracking dashboard.</p>
+        <form method="POST" action="{{ url_for('refresh_all_assets_data') }}" style="margin: 0;">
+            <button type="submit" class="button-link-refresh" 
+                    onclick="return confirm('Are you sure you want to refresh market data for ALL assets? This may take a moment.');">
+                Refresh All Asset Data
+            </button>
+        </form>
+    </div>
+
+    <hr>
+    <h2>Global Portfolio Overview</h2>
+    {% if global_data %} 
+        <div class="dashboard-summary">
+            <div class="summary-card summary-card-total">
+                <h4>Overall Value (Assets + Cash)</h4>
+                <p>{{ global_data.overall_portfolio_value | currency }}</p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Invested (Assets + Cash)</h4>
+                <p>{{ global_data.total_invested_assets_plus_cash | currency }}</p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Profit / Loss ($)</h4>
+                <p class="{% if global_data.profit_loss_amount >= 0 %}profit{% else %}loss{% endif %}">
+                    {{ global_data.profit_loss_amount | currency }}
+                </p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Profit / Loss (%)</h4>
+                <p class="{% if global_data.profit_loss_percent >= 0 %}profit{% else %}loss{% endif %}">
+                    {% if global_data.profit_loss_percent is not none %}{{ "%.2f"|format(global_data.profit_loss_percent) }}%{% else %}N/A{% endif %}
+                </p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Cash Available</h4>
+                <p>{{ global_data.total_cash | currency }}</p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Invested (Assets)</h4>
+                <p>{{ global_data.total_invested_assets | currency }}</p> {# Corrected key #}
+            </div>
+            <div class="summary-card">
+                <h4>Current Value of Assets</h4>
+                <p>{{ global_data.current_value_of_assets | currency }}</p>
+            </div>
+           
+
+            {% if breakdown_data %}
+                {% for user_summary in breakdown_data %}
+                    <div class="summary-card user-worth-card">
+                        <h4>{{ user_summary.user_name }}'s Total Worth</h4>
+                        <p>{{ (user_summary.current_value_of_assets + user_summary.total_cash) | currency }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if breakdown_data %}
+                {% for user_summary in breakdown_data %}
+                    <div class="summary-card user-invested-card">
+                        <h4>{{ user_summary.user_name }}'s Total Invested</h4>
+                        <p>{{ user_summary.total_invested | currency }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="summary-card">
+                <h4>USD/CAD Exchange Rate</h4>
+                <p>1 USD = {{ global_data.usd_to_cad_exchange_rate | number_with_commas(4) if global_data.usd_to_cad_exchange_rate else 'N/A (Refresh)' }} CAD</p>
+            </div>
+        </div>
+
+        <div class="dashboard-summary performer-cards-container" style="margin-top: 20px;">
+            {% if global_data.best_performing_asset %}
+            <div class="summary-card best-performer">
+                <h4>Best Performing Asset</h4>
+                <div class="performer-card-content">
+                    <div class="performer-column-left">
+                        <p><strong>{{ global_data.best_performing_asset.ticker_symbol }}</strong> 
+                           ({{ global_data.best_performing_asset.asset_name if global_data.best_performing_asset.asset_name else 'N/A' }})
+                        </p>
+                        <p><small>In Account: {{ global_data.best_performing_asset.account_name }}</small></p>
+                        <p><small>Invested: {{ global_data.best_performing_asset.total_invested | currency }}</small></p>
+                        <p>P/L: <span class="profit">{{ global_data.best_performing_asset.profit_loss_dollars | currency }} 
+                            ({{ "%.2f"|format(global_data.best_performing_asset.profit_loss_percent) }}%)</span>
+                        </p>
+                    </div>
+                    <div class="performer-column-right">
+                        <p>Current Price: {{ global_data.best_performing_asset.current_price | currency }}</p>
+                        <p>52W Low: {{ global_data.best_performing_asset.fifty_two_week_low | currency }}</p>
+                        <p>52W High: {{ global_data.best_performing_asset.fifty_two_week_high | currency }}</p>
+                        <p>% to 52W High: 
+                            {% if global_data.best_performing_asset.percent_to_52_week_high is not none %}
+                                {{ "%.2f"|format(global_data.best_performing_asset.percent_to_52_week_high) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% if global_data.best_performing_asset.yearly_chart_data %}
+                    <div id="best_performer_chart_div" style="width: 100%; height: 100px; margin-top:10px; clear:both;"></div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if global_data.worst_performing_asset %}
+            <div class="summary-card worst-performer">
+                <h4>Worst Performing Asset</h4>
+                <div class="performer-card-content">
+                    <div class="performer-column-left">
+                        <p><strong>{{ global_data.worst_performing_asset.ticker_symbol }}</strong> 
+                           ({{ global_data.worst_performing_asset.asset_name if global_data.worst_performing_asset.asset_name else 'N/A' }})
+                        </p>
+                        <p><small>In Account: {{ global_data.worst_performing_asset.account_name }}</small></p>
+                        <p><small>Invested: {{ global_data.worst_performing_asset.total_invested | currency }}</small></p>
+                        <p>P/L: <span class="loss">{{ global_data.worst_performing_asset.profit_loss_dollars | currency }} 
+                            ({{ "%.2f"|format(global_data.worst_performing_asset.profit_loss_percent) }}%)</span>
+                        </p>
+                    </div>
+                    <div class="performer-column-right">
+                        <p>Current Price: {{ global_data.worst_performing_asset.current_price | currency }}</p>
+                        <p>52W Low: {{ global_data.worst_performing_asset.fifty_two_week_low | currency }}</p>
+                        <p>52W High: {{ global_data.worst_performing_asset.fifty_two_week_high | currency }}</p>
+                        <p>% to 52W High: 
+                            {% if global_data.worst_performing_asset.percent_to_52_week_high is not none %}
+                                {{ "%.2f"|format(global_data.worst_performing_asset.percent_to_52_week_high) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                {% if global_data.worst_performing_asset.yearly_chart_data %}
+                    <div id="worst_performer_chart_div" style="width: 100%; height: 100px; margin-top:10px; clear:both;"></div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+
+        <hr>
+        <h2>Goal Tracker & Settings</h2> 
+        <div class="dashboard-goal-section">
+            <div class="goal-tracker-container">
+                 <h3>Progress</h3> 
+                <div id="goal_gauge_chart" style="width: 100%; max-width: 400px; height: 280px; margin: 0 auto;"></div>
+            </div>
+            <div class="set-goal-container">
+                <h3>Set Your Financial Goal</h3> 
+                <form method="POST" action="{{ url_for('index') }}" class="goal-form">
+                    <input type="hidden" name="action" value="set_goal">
+                    <div>
+                        <label for="target_goal_value">Target Portfolio Value ($):</label>
+                        <input type="number" step="any" id="target_goal_value" name="target_goal_value" 
+                               value="{{ global_data.target_goal_value if global_data and global_data.target_goal_value is not none else '100000' }}" 
+                               required>
+                    </div>
+                    <button type="submit">Set/Update Goal</button>
+                </form>
+                <p>Current Goal: <strong>{{ global_data.target_goal_value | currency if global_data and global_data.target_goal_value is not none else 'Not Set' }}</strong></p>
+            </div>
+        </div>
+        
+        
+        {% if global_data %} 
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['gauge', 'corechart']}); 
+            google.charts.setOnLoadCallback(drawCharts);
+
+            function drawCharts() {
+                drawGoalGauge();
+                drawPortfolioHistoryChart();
+                drawAssetPerformanceChart(); 
+                drawAccountTypeAllocationChart(); 
+                drawUserAllocationChart(); 
+                drawIndividualAccountAllocationChart(); 
+                
+                if ({{ global_data.best_performing_asset and global_data.best_performing_asset.yearly_chart_data | default(false) | tojson | safe }}) {
+                    drawBestAssetYearlyChart();
+                }
+                if ({{ global_data.worst_performing_asset and global_data.worst_performing_asset.yearly_chart_data | default(false) | tojson | safe }}) {
+                    drawWorstAssetYearlyChart();
+                }
+            }
+
+            function drawGoalGauge() {
+                var overallPortfolioValue = {{ global_data.overall_portfolio_value | default(0) }};
+                var totalInvested = {{ global_data.total_invested_assets_plus_cash | default(0) }}; 
+                var targetGoal = {{ global_data.target_goal_value | default(100000) }}; 
+                var data = google.visualization.arrayToDataTable([['Label', 'Value'],['Progress', overallPortfolioValue]]);
+                var redFrom = 0, redTo = Math.max(0, totalInvested - 0.01); 
+                var greenFrom = totalInvested, greenTo = Math.max(totalInvested, targetGoal - 0.01); 
+                var blueFrom = targetGoal, blueTo = Math.max(targetGoal, overallPortfolioValue * 1.1, targetGoal * 1.1); 
+                if (totalInvested <= 0) { redTo = 0; greenFrom = 0; }
+                if (targetGoal <= totalInvested) { greenTo = totalInvested; if (overallPortfolioValue >= targetGoal) { blueFrom = Math.min(targetGoal, overallPortfolioValue); }}
+                var gaugeMax = Math.max(targetGoal, overallPortfolioValue * 1.1); if (gaugeMax <=0) gaugeMax = 100; 
+                var options = {
+                    width: 400, height: 280, redFrom: redFrom, redTo: redTo, greenFrom: greenFrom, greenTo: greenTo,
+                    blueFrom: blueFrom, blueTo: blueTo, minorTicks: 5, max: gaugeMax, animation:{ duration: 1000, easing: 'out' },
+                    majorTicks: ['0', String(Math.round(targetGoal/2)), String(Math.round(targetGoal))]
+                };
+                if (targetGoal > 0) {
+                    options.majorTicks = ['0', formatLabel(totalInvested), formatLabel(targetGoal)];
+                    if (overallPortfolioValue > targetGoal) { options.majorTicks.push(formatLabel(overallPortfolioValue)); }
+                } else { options.majorTicks = ['0', formatLabel(overallPortfolioValue/2), formatLabel(overallPortfolioValue)];}
+                var chart = new google.visualization.Gauge(document.getElementById('goal_gauge_chart'));
+                chart.draw(data, options);
+            }
+            function formatLabel(value) {
+                if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
+                return String(Math.round(value));
+            }
+            function drawPortfolioHistoryChart() {
+                var historyData = {{ global_data.portfolio_history_for_chart | default([], true) | tojson | safe }};
+                var chartDiv = document.getElementById('portfolio_history_chart');
+                if (!historyData || historyData.length === 0) { if(chartDiv) chartDiv.innerHTML = '<p style=\"text-align:center; padding:20px;\">Not enough data for portfolio history chart.</p>'; return; }
+                var data = new google.visualization.DataTable(); data.addColumn('date', 'Date'); data.addColumn('number', 'Portfolio Value');
+                historyData.forEach(function(row) { var dateParts = row.snapshot_date.split('-'); data.addRow([new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2])), row.total_portfolio_value]); });
+                var options = { title: 'Portfolio Value Over Time', curveType: 'function', legend: { position: 'bottom' }, hAxis: { title: 'Date', format: 'MMM d, yy', gridlines: {color: 'transparent'} }, vAxis: { title: 'Portfolio Value ($)', format: 'short', viewWindow: { min: 0 } }, series: { 0: { color: '#007bff' } }, chartArea: {width: '80%', height: '70%'}, height: 400 };
+                var chart = new google.visualization.LineChart(chartDiv); chart.draw(data, options);
+            }
+            function drawAssetPerformanceChart() {
+                var rankedAssets = {{ global_data.all_assets_ranked | default([], true) | tojson | safe }};
+                var chartDiv = document.getElementById('asset_performance_chart');
+                if (!rankedAssets || rankedAssets.length === 0) { if(chartDiv) chartDiv.innerHTML = '<p style=\"text-align:center; padding:20px;\">No assets for performance chart.</p>'; return; }
+                var topN = 5; var assetsForChart = [];
+                for (var i = 0; i < Math.min(topN, rankedAssets.length); i++) { if (rankedAssets[i].profit_loss_percent !== null) { assetsForChart.push([ rankedAssets[i].ticker_symbol + (rankedAssets[i].asset_name ? ' (' + rankedAssets[i].asset_name.substring(0,15) + '...)' : ''), rankedAssets[i].profit_loss_percent, (rankedAssets[i].profit_loss_percent >= 0 ? '#28a745' : '#dc3545'), rankedAssets[i].ticker_symbol + ': ' + rankedAssets[i].profit_loss_percent.toFixed(2) + '% (' + formatCurrencyJS(rankedAssets[i].profit_loss_dollars) + ')']);}}
+                if (assetsForChart.length === 0) { if(chartDiv) chartDiv.innerHTML = '<p style=\"text-align:center; padding:20px;\">No assets with calculable performance.</p>'; return; }
+                var data = new google.visualization.DataTable(); data.addColumn('string', 'Asset'); data.addColumn('number', 'P/L %'); data.addColumn({type: 'string', role: 'style'}); data.addColumn({type: 'string', role: 'tooltip'}); data.addRows(assetsForChart);
+                var options = { title: 'Top Asset Performance (P/L %)', legend: { position: 'none' }, bars: 'horizontal', hAxis: { title: 'Profit/Loss Percentage (%)' }, vAxis: { title: 'Asset' }, tooltip: {isHtml: true}, chartArea: {width: '60%', height: '80%'}, height: Math.max(250, assetsForChart.length * 50), bar: { groupWidth: '75%' }};
+                var chart = new google.visualization.BarChart(chartDiv); chart.draw(data, options);
+            }
+            function drawAccountTypeAllocationChart() {
+                var accTypeData = {{ global_data.account_type_allocation_data_for_chart | default([['Type', 'Value']], true) | tojson | safe }};
+                var chartDiv = document.getElementById('account_type_allocation_chart');
+                if (!accTypeData || accTypeData.length <= 1) { 
+                    if(chartDiv) chartDiv.innerHTML = '<p style=\"text-align:center; padding:20px;\">Not enough data for account type allocation.</p>';
+                    return;
+                }
+                var data = google.visualization.arrayToDataTable(accTypeData);
+                var options = { title: 'Portfolio Allocation by Account Type', pieHole: 0.4, height: 350, chartArea: {width: '90%', height: '80%'}, legend: { position: 'bottom' }};
+                var chart = new google.visualization.PieChart(chartDiv); chart.draw(data, options);
+            }
+            function drawUserAllocationChart() {
+                var userData = {{ global_data.user_allocation_data_for_chart | default([['User', 'Value']], true) | tojson | safe }};
+                var chartDiv = document.getElementById('user_allocation_chart');
+                if (!userData || userData.length <= 1) { 
+                    if(chartDiv) chartDiv.innerHTML = '<p style=\"text-align:center; padding:20px;\">Not enough user data for allocation chart.</p>';
+                    return;
+                }
+                var data = google.visualization.arrayToDataTable(userData);
+                var options = { title: 'Portfolio Allocation by User', pieHole: 0.4, height: 350, chartArea: {width: '90%', height: '80%'}, legend: { position: 'bottom' }};
+                var chart = new google.visualization.PieChart(chartDiv); chart.draw(data, options);
+            }
+            function drawIndividualAccountAllocationChart() { 
+                var individualAccData = {{ global_data.individual_account_allocation_data_for_chart | default([['Account', 'Value']], true) | tojson | safe }};
+                var chartDiv = document.getElementById('individual_account_allocation_chart');
+                if (!individualAccData || individualAccData.length <= 1) { 
+                    if(chartDiv) chartDiv.innerHTML = '<p style=\"text-align:center; padding:20px;\">Not enough data for individual account allocation.</p>';
+                    return;
+                }
+                var data = google.visualization.arrayToDataTable(individualAccData);
+                var options = {
+                    title: 'Portfolio Allocation by Account',
+                    pieHole: 0.4, height: 350,
+                    chartArea: {width: '90%', height: '80%'},
+                    legend: { position: 'right', textStyle: {fontSize: 10} } 
+                };
+                var chart = new google.visualization.PieChart(chartDiv);
+                chart.draw(data, options);
+            }
+            
+            function drawAssetYearlyChart(chartDivId, chartData, assetTicker) {
+                var dataTable = new google.visualization.DataTable();
+                dataTable.addColumn('date', 'Date');
+                dataTable.addColumn('number', assetTicker);
+
+                var rows = chartData.map(function(row) {
+                    var dateParts = row[0].split('-'); 
+                    return [new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2])), row[1]];
+                });
+                dataTable.addRows(rows);
+
+                var options = {
+                    legend: 'none',
+                    hAxis: { textPosition: 'none', gridlines: {color: 'transparent'} }, 
+                    vAxis: { textPosition: 'none', gridlines: {color: 'transparent'} }, 
+                    chartArea: {left:5, top:5, width:'90%', height:'85%'}, 
+                    series: { 0: { color: (chartData.length > 1 && chartData[chartData.length-1][1] >= chartData[0][1] ? '#28a745' : '#dc3545') } }, 
+                    width: '100%', 
+                    height: '100%' 
+                };
+                var chart = new google.visualization.LineChart(document.getElementById(chartDivId));
+                chart.draw(dataTable, options);
+            }
+
+            function drawBestAssetYearlyChart() {
+                var chartData = {{ global_data.best_performing_asset.yearly_chart_data | default([], true) | tojson | safe }};
+                var ticker = "{{ global_data.best_performing_asset.ticker_symbol if global_data.best_performing_asset else '' }}";
+                var chartDiv = document.getElementById('best_performer_chart_div');
+                if (chartData && chartData.length > 1 && ticker && chartDiv) {
+                    drawAssetYearlyChart('best_performer_chart_div', chartData, ticker);
+                } else if (chartDiv) {
+                    chartDiv.innerHTML = '<p style="font-size:0.8em; text-align:center; margin-top:10px;">Yearly chart data not available.</p>';
+                }
+            }
+
+            function drawWorstAssetYearlyChart() {
+                var chartData = {{ global_data.worst_performing_asset.yearly_chart_data | default([], true) | tojson | safe }};
+                var ticker = "{{ global_data.worst_performing_asset.ticker_symbol if global_data.worst_performing_asset else '' }}";
+                var chartDiv = document.getElementById('worst_performer_chart_div');
+                 if (chartData && chartData.length > 1 && ticker && chartDiv) {
+                    drawAssetYearlyChart('worst_performer_chart_div', chartData, ticker);
+                } else if (chartDiv) {
+                     chartDiv.innerHTML = '<p style="font-size:0.8em; text-align:center; margin-top:10px;">Yearly chart data not available.</p>';
+                }
+            }
+
+            function formatCurrencyJS(value) {
+                if (value === null || typeof value === 'undefined') return 'N/A';
+                return '$' + value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+
+            // --- Table Sorting JavaScript ---
+            function sortTable(tableId, columnIndex, dataType) {
+                const table = document.getElementById(tableId);
+                if (!table) return; 
+                const tbody = table.tBodies[0];
+                if (!tbody) return; 
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+                const headerCell = table.tHead.querySelectorAll("th")[columnIndex];
+
+                let currentDirection = headerCell.getAttribute('data-sort-direction');
+                let newDirection;
+                if (currentDirection === 'desc') { 
+                    newDirection = 'asc';
+                } else { 
+                    newDirection = 'desc'; 
+                }
+                headerCell.setAttribute('data-sort-direction', newDirection);
+
+                table.querySelectorAll("th.sortable").forEach(th => {
+                    th.classList.remove('sort-asc', 'sort-desc');
+                    const arrow = th.querySelector('.sort-arrow');
+                    if (arrow) arrow.remove();
+                    if (th !== headerCell) { 
+                        th.removeAttribute('data-sort-direction'); 
+                    }
+                });
+
+                headerCell.classList.add(newDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                const arrowSpan = document.createElement('span');
+                arrowSpan.classList.add('sort-arrow');
+                arrowSpan.innerHTML = newDirection === 'asc' ? ' &uarr;' : ' &darr;';
+                headerCell.appendChild(arrowSpan);
+
+
+                rows.sort((a, b) => {
+                    let valA = a.cells[columnIndex].textContent.trim();
+                    let valB = b.cells[columnIndex].textContent.trim();
+
+                    if (dataType === 'number' || dataType === 'currency' || dataType === 'percent') {
+                        valA = parseFloat(valA.replace(/[^0-9.-]+/g,"")); 
+                        valB = parseFloat(valB.replace(/[^0-9.-]+/g,""));
+                        if (isNaN(valA)) valA = newDirection === 'asc' ? Infinity : -Infinity; 
+                        if (isNaN(valB)) valB = newDirection === 'asc' ? Infinity : -Infinity;
+                    } else { 
+                        valA = valA.toLowerCase();
+                        valB = valB.toLowerCase();
+                    }
+
+                    if (valA < valB) {
+                        return newDirection === 'asc' ? -1 : 1;
+                    }
+                    if (valA > valB) {
+                        return newDirection === 'asc' ? 1 : -1;
+                    }
+                    return 0;
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const rankedAccountsTable = document.getElementById('rankedAccountsTable');
+                if (rankedAccountsTable) {
+                    rankedAccountsTable.querySelectorAll("th.sortable").forEach((th, index) => {
+                        th.addEventListener('click', () => sortTable('rankedAccountsTable', index, th.getAttribute('data-sort-type')));
+                    });
+                }
+                const rankedAssetsTableGlobal = document.getElementById('rankedAssetsTableGlobal');
+                if (rankedAssetsTableGlobal) {
+                    rankedAssetsTableGlobal.querySelectorAll("th.sortable").forEach((th, index) => {
+                        th.addEventListener('click', () => sortTable('rankedAssetsTableGlobal', index, th.getAttribute('data-sort-type')));
+                    });
+                }
+                document.querySelectorAll('.assets-table-in-breakdown').forEach(table => {
+                    const tableId = table.id;
+                    if (tableId) { 
+                        table.querySelectorAll("th.sortable").forEach((th, index) => {
+                            th.addEventListener('click', () => sortTable(tableId, index, th.getAttribute('data-sort-type')));
+                        });
+                    }
+                });
+            });
+
+        </script>
+        {% endif %} 
+
+
+        <hr>
+        <h2>Portfolio History</h2>
+        <div id="portfolio_history_chart" style="width: 100%; min-height: 400px;"></div> 
+
+        <hr>
+        <div class="charts-row-container"> 
+            <div class="chart-column">
+                <h2>Asset Performance Snapshot</h2>
+                <div id="asset_performance_chart" style="width: 100%; min-height: 350px;"></div>
+            </div>
+            <div class="chart-column">
+                <h2>Account Type Allocation</h2> 
+                <div id="account_type_allocation_chart" style="width: 100%; min-height: 350px;"></div> 
+            </div>
+        </div>
+        <div class="charts-row-container" style="margin-top: 20px;"> 
+            <div class="chart-column">
+                <h2>User Allocation</h2>
+                <div id="user_allocation_chart" style="width: 100%; min-height: 350px;"></div> 
+            </div>
+            <div class="chart-column">
+                <h2>Portfolio Allocation by Account</h2> 
+                <div id="individual_account_allocation_chart" style="width: 100%; min-height: 350px;"></div> 
+            </div>
+        </div>
+
+
+        <hr>
+        <h2>Accounts Ranked by Performance (P/L %)</h2>
+        {% if global_data and global_data.all_accounts_ranked_by_performance %}
+            <table class="assets-table ranked-accounts-table" id="rankedAccountsTable"> 
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort-type="number">Rank</th>
+                        <th class="sortable" data-sort-type="string">Account Display Name</th>
+                        <th class="sortable" data-sort-type="string">User</th>
+                        <th class="sortable" data-sort-type="string">Platform</th>
+                        <th class="sortable" data-sort-type="percent">P/L %</th>
+                        <th class="sortable" data-sort-type="currency">P/L $</th>
+                        <th class="sortable" data-sort-type="currency">Current Value</th>
+                        <th class="sortable" data-sort-type="currency">Total Invested</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for acc_perf in global_data.all_accounts_ranked_by_performance %}
+                        <tr>
+                            <td class="is-numeric">{{ loop.index }}</td>
+                            <td>{{ acc_perf.display_name }}</td>
+                            <td>{{ acc_perf.user_name }}</td>
+                            <td>{{ acc_perf.platform_name }}</td>
+                            <td class="{% if acc_perf.profit_loss_percent >= 0 %}profit{% else %}loss{% endif %} is-numeric">{{ "%.2f"|format(acc_perf.profit_loss_percent) }}%</td>
+                            <td class="{% if acc_perf.profit_loss_dollars >= 0 %}profit{% else %}loss{% endif %} is-numeric">{{ acc_perf.profit_loss_dollars | currency }}</td>
+                            <td class="is-numeric">{{ acc_perf.current_value_of_assets | currency }}</td>
+                            <td class="is-numeric">{{ acc_perf.total_invested | currency }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No account performance data available for ranking.</p>
+        {% endif %}
+
+
+        <hr>
+        <h2>All Assets Ranked by Performance (P/L %)</h2>
+        {% if global_data and global_data.all_assets_ranked %}
+            <table class="assets-table ranked-assets-table" id="rankedAssetsTableGlobal"> 
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort-type="number">Rank</th>
+                        <th class="sortable" data-sort-type="string">Ticker</th>
+                        <th class="sortable" data-sort-type="string">Name</th>
+                        <th class="sortable" data-sort-type="currency">Current Price</th>
+                        <th class="sortable" data-sort-type="currency">Average Cost</th>
+                        <th class="sortable" data-sort-type="currency">Current Value</th>
+                        <th class="sortable" data-sort-type="currency">Total Invested</th>
+                        <th class="sortable" data-sort-type="percent">P/L %</th>
+                        <th class="sortable" data-sort-type="currency">P/L $</th>
+                        <th class="sortable" data-sort-type="currency">52W Low</th>
+                        <th class="sortable" data-sort-type="currency">52W High</th>
+                        <th class="sortable" data-sort-type="percent">% to 52W High</th>
+                        <th>Actions</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in global_data.all_assets_ranked %}
+                        <tr>
+                            <td class="is-numeric">{{ loop.index }}</td>
+                            <td>{{ asset.ticker_symbol }}</td>
+                            <td>{{ asset.asset_name if asset.asset_name else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.current_price | currency }}</td>
+                            <td class="is-numeric">{{ asset.average_cost | currency }}</td>
+                            <td class="is-numeric">{{ asset.current_value | currency }}</td>
+                            <td class="is-numeric">{{ asset.total_invested | currency }}</td>
+                            <td class="{% if asset.profit_loss_percent >= 0 %}profit{% else %}loss{% endif %} is-numeric">{{ "%.2f"|format(asset.profit_loss_percent) }}%</td>
+                            <td class="{% if asset.profit_loss_dollars >= 0 %}profit{% else %}loss{% endif %} is-numeric">{{ asset.profit_loss_dollars | currency }}</td>
+                            <td class="is-numeric">{{ asset.fifty_two_week_low | currency if asset.fifty_two_week_low is not none else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.fifty_two_week_high | currency if asset.fifty_two_week_high is not none else 'N/A' }}</td>
+                            <td class="is-numeric">
+                                {% if asset.percent_to_52_week_high is not none %}
+                                    {{ "%.2f"|format(asset.percent_to_52_week_high) }}%
+                                    {% if asset.percent_to_52_week_high == 0 %} (At High)
+                                    {% elif asset.percent_to_52_week_high > 0 %} (Above High)
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('edit_asset', asset_id=asset.asset_id) }}" class="button-link-edit-small">Edit</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No assets available for ranking.</p>
+        {% endif %}
+
+
+        <hr>
+        <h2>Breakdown by Person, Platform & Account</h2>
+        {% if breakdown_data %}
+            {% for user_summary in breakdown_data %}
+                <div class="user-breakdown">
+                    <h3>User: {{ user_summary.user_name }}</h3>
+                    <div class="dashboard-summary">
+                         <div class="summary-card">
+                            <h4>Total Invested (User)</h4>
+                            <p>{{ user_summary.total_invested | currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Value of Assets (User)</h4>
+                            <p>{{ user_summary.current_value_of_assets | currency }}</p>
+                        </div>
+                         <div class="summary-card">
+                            <h4>P/L (User Assets)</h4>
+                            <p class="{% if user_summary.profit_loss_amount >= 0 %}profit{% else %}loss{% endif %}">
+                                {{ user_summary.profit_loss_amount | currency }}
+                                ({% if user_summary.profit_loss_percent is not none %}{{ "%.2f"|format(user_summary.profit_loss_percent) }}%{% else %}N/A{% endif %})
+                            </p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Cash (User)</h4>
+                            <p>{{ user_summary.total_cash | currency }}</p>
+                        </div>
+                    </div>
+
+                    {% if user_summary.platforms %}
+                        {% for platform_summary in user_summary.platforms %}
+                            <div class="platform-breakdown">
+                                <h4>Platform: {{ platform_summary.platform_name }}</h4>
+                                 <div class="dashboard-summary dashboard-summary-platform">
+                                   <div class="summary-card">
+                                        <h5>Invested</h5>
+                                        <p>{{ platform_summary.total_invested | currency }}</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h5>Asset Value</h5>
+                                        <p>{{ platform_summary.current_value_of_assets | currency }}</p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h5>P/L (Assets)</h5>
+                                        <p class="{% if platform_summary.profit_loss_amount >= 0 %}profit{% else %}loss{% endif %}">
+                                            {{ platform_summary.profit_loss_amount | currency }}
+                                            ({% if platform_summary.profit_loss_percent is not none %}{{ "%.2f"|format(platform_summary.profit_loss_percent) }}%{% else %}N/A{% endif %})
+                                        </p>
+                                    </div>
+                                    <div class="summary-card">
+                                        <h5>Cash</h5>
+                                        <p>{{ platform_summary.total_cash | currency }}</p>
+                                    </div>
+                                </div>
+
+                                {% if platform_summary.accounts %}
+                                    {% for account_summary in platform_summary.accounts %}
+                                        <div class="account-breakdown">
+                                            <h5>Account: {{ account_summary.account_name }} ({{ account_summary.account_type }}) 
+                                                <a href="{{ url_for('manage_account_assets', account_id=account_summary.account_id) }}" class="button-link-manage-assets">Manage Assets</a>
+                                            </h5>
+                                            <p class="is-numeric">Cash in Account: {{ account_summary.cash_balance | currency }}</p>
+                                            {% if account_summary.assets %}
+                                                <table class="assets-table assets-table-in-breakdown" id="assetsTable_{{ user_summary.user_id }}_{{ platform_summary.platform_id }}_{{ account_summary.account_id }}"> 
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="sortable" data-sort-type="string">Ticker</th>
+                                                            <th class="sortable" data-sort-type="string">Name</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="number">Qty</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">Avg. Cost</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">Total Invested</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">Current Price</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">Current Value</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">P/L $</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="percent">P/L %</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="percent">Day Change %</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">52W High</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="currency">52W Low</th>
+                                                            <th class="is-numeric-header sortable" data-sort-type="percent">% to 52W High</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for asset in account_summary.assets %}
+                                                            <tr>
+                                                                <td>{{ asset.ticker_symbol }}</td>
+                                                                <td>{{ asset.asset_name if asset.asset_name else 'N/A' }}</td>
+                                                                <td class="is-numeric">{{ asset.quantity | number_with_commas }}</td>
+                                                                <td class="is-numeric">{{ asset.average_cost | currency }}</td>
+                                                                <td class="is-numeric">{{ asset.total_invested | currency }}</td>
+                                                                <td class="is-numeric">{{ asset.current_price | currency }}</td>
+                                                                <td class="is-numeric">{{ asset.current_value | currency }}</td>
+                                                                <td class="{% if asset.profit_loss_dollars >= 0 %}profit{% else %}loss{% endif %} is-numeric">{{ asset.profit_loss_dollars | currency }}</td>
+                                                                <td class="{% if asset.profit_loss_percent >= 0 %}profit{% else %}loss{% endif %} is-numeric">{{ "%.2f"|format(asset.profit_loss_percent) }}%</td>
+                                                                <td class="{% if asset.day_change_percent >= 0 %}profit{% else %}loss{% endif %} is-numeric">
+                                                                    {% if asset.day_change_percent is not none %}{{ "%.2f"|format(asset.day_change_percent) }}%{% else %}N/A{% endif %}
+                                                                </td>
+                                                                <td class="is-numeric">{{ asset.fifty_two_week_high | currency }}</td>
+                                                                <td class="is-numeric">{{ asset.fifty_two_week_low | currency }}</td>
+                                                                <td class="is-numeric">
+                                                                    {% if asset.percent_to_52_week_high is not none %}
+                                                                        {{ "%.2f"|format(asset.percent_to_52_week_high) }}%
+                                                                        {% if asset.percent_to_52_week_high == 0 %} (At High)
+                                                                        {% elif asset.percent_to_52_week_high > 0 %} (Above High)
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        N/A
+                                                                    {% endif %}
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            {% else %}
+                                                <p>No assets in this account.</p>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                     <p>No accounts found on this platform for {{ user_summary.user_name }}.</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No platforms with investments found for {{ user_summary.user_name }}.</p>
+                    {% endif %}
+                    <hr class="user-separator">
+                </div>
+            {% endfor %}
+        {% else %} <p>No breakdown data available.</p>
+        {% endif %} 
+
+    {% else %} 
+        <p>No global data available to display yet. Add some accounts and assets to get started!</p>
+    {% endif %} 
+{% endblock %}

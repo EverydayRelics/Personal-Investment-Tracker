@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }} - Investment Tracker
+{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <h3>Add New User</h3>
+    <form method="POST" action="{{ url_for('manage_users') }}">
+        <div>
+            <label for="name">User Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <button type="submit">Add User</button>
+    </form>
+
+    <hr>
+
+    <h3>Existing Users</h3>
+    {% if users %}
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user['user_id'] }}</td>
+                        <td>{{ user['name'] }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_user', user_id=user['user_id']) }}">Edit</a>
+                            </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No users found. Add one above!</p>
+    {% endif %}
+{% endblock %}

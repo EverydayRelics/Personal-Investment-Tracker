@@ -1,0 +1,252 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }} - Investment Tracker
+{% endblock %}
+
+{% block content %}
+    <script>
+        function toggleSimForm(formId) { 
+            var form = document.getElementById(formId);
+            if (form.style.display === "block") {
+                form.style.display = "none";
+            } else {
+                form.style.display = "block";
+            }
+            closeAllActionDropdowns(null); 
+        }
+
+        function toggleActionDropdown(dropdownId, event) {
+            event.stopPropagation(); 
+            var allDropdowns = document.getElementsByClassName('actions-dropdown-content');
+            var currentDropdown = document.getElementById(dropdownId);
+
+            for (var i = 0; i < allDropdowns.length; i++) {
+                if (allDropdowns[i].id !== dropdownId) {
+                    allDropdowns[i].style.display = 'none';
+                }
+            }
+            if (currentDropdown.style.display === "block") {
+                currentDropdown.style.display = "none";
+            } else {
+                currentDropdown.style.display = "block";
+            }
+        }
+
+        function closeAllActionDropdowns(event, skipDropdownId) {
+            if (event) event.stopPropagation();
+            var dropdowns = document.getElementsByClassName("actions-dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].id !== skipDropdownId) {
+                     dropdowns[i].style.display = "none";
+                }
+            }
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.actions-dropdown-btn')) {
+                closeAllActionDropdowns(null);
+            }
+        }
+    </script>
+
+    <h2>{{ title }}</h2>
+    
+    {% if account %}
+        <p><strong>User:</strong> {{ account['user_name'] }}</p>
+        <p><strong>Platform:</strong> {{ account['platform_name'] }}</p>
+        <p><a href="{{ url_for('manage_accounts') }}">&laquo; Back to All Accounts</a></p>
+    {% else %}
+        <p>Account details not found.</p>
+        <p><a href="{{ url_for('manage_accounts') }}">&laquo; Back to All Accounts</a></p>
+    {% endif %}
+
+    {% if account %}
+        <hr>
+        <h3>Add New Asset to {{ account['account_name'] }}</h3>
+        <form method="POST" action="{{ url_for('manage_account_assets', account_id=account['account_id']) }}">
+            <input type="hidden" name="action" value="add_asset">
+            <div>
+                <label for="ticker_symbol_add">Ticker Symbol:</label>
+                <input type="text" id="ticker_symbol_add" name="ticker_symbol" required>
+            </div>
+            <div>
+                <label for="asset_name_add">Asset Name (Optional):</label>
+                <input type="text" id="asset_name_add" name="asset_name">
+            </div>
+            <div>
+                <label for="quantity_add">Quantity:</label>
+                <input type="number" step="any" id="quantity_add" name="quantity" required placeholder="e.g., 10.5">
+            </div>
+            <div>
+                <label for="average_cost_add">Average Cost (per unit - Manual Entry):</label>
+                <input type="number" step="any" id="average_cost_add" name="average_cost" required placeholder="e.g., 75.50">
+            </div>
+            <div>
+                <label for="total_invested_add">Total Invested Amount (Manual Entry):</label>
+                <input type="number" step="any" id="total_invested_add" name="total_invested" required placeholder="e.g., 792.75">
+            </div>
+            <button type="submit">Add Asset</button>
+        </form>
+
+        <hr>
+        <h3>Assets in {{ account['account_name'] }}</h3>
+        {% if assets %}
+            <table class="assets-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Name</th>
+                        <th class="is-numeric-header">Qty</th>
+                        <th class="is-numeric-header">Avg. Cost</th>
+                        <th class="is-numeric-header">Total Invested</th>
+                        <th class="is-numeric-header">Current Price</th>
+                        <th class="is-numeric-header">Current Value</th>
+                        <th class="is-numeric-header">P/L $</th>
+                        <th class="is-numeric-header">P/L %</th>
+                        <th class="is-numeric-header">Day Change %</th>
+                        <th class="is-numeric-header">52W High</th>
+                        <th class="is-numeric-header">52W Low</th>
+                        <th class="is-numeric-header">% to 52W High</th>
+                        <th>Actions</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %} {# Ensure this 'assets' variable is the processed list #}
+                        <tr>
+                            <td>{{ asset.ticker_symbol }}</td>
+                            <td>{{ asset.name if asset.name else (asset.asset_name if asset.asset_name else 'N/A') }}</td>
+                            <td class="is-numeric">{{ asset.quantity | number_with_commas if asset.quantity is not none else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.average_cost | currency if asset.average_cost is not none else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.total_invested | currency if asset.total_invested is not none else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.current_price | currency if asset.current_price is not none else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.current_value | currency if asset.current_value is not none else 'N/A' }}</td>
+                            <td class="{% if asset.profit_loss_dollars is not none and asset.profit_loss_dollars >= 0 %}profit{% elif asset.profit_loss_dollars is not none %}loss{% endif %} is-numeric">
+                                {{ asset.profit_loss_dollars | currency if asset.profit_loss_dollars is not none else 'N/A' }}
+                            </td>
+                            <td class="{% if asset.profit_loss_percent is not none and asset.profit_loss_percent >= 0 %}profit{% elif asset.profit_loss_percent is not none %}loss{% endif %} is-numeric">
+                                {% if asset.profit_loss_percent is not none %}{{ "%.2f"|format(asset.profit_loss_percent) }}%{% else %}N/A{% endif %}
+                            </td>
+                            <td class="{% if asset.day_change_percent is not none and asset.day_change_percent >= 0 %}profit{% elif asset.day_change_percent is not none %}loss{% endif %} is-numeric">
+                                {% if asset.day_change_percent is not none %}{{ "%.2f"|format(asset.day_change_percent) }}%{% else %}N/A{% endif %}
+                            </td>
+                            <td class="is-numeric">{{ asset.fifty_two_week_high | currency if asset.fifty_two_week_high is not none else 'N/A' }}</td>
+                            <td class="is-numeric">{{ asset.fifty_two_week_low | currency if asset.fifty_two_week_low is not none else 'N/A' }}</td>
+                            <td class="is-numeric">
+                                {% if asset.percent_to_52_week_high is not none %}
+                                    {{ "%.2f"|format(asset.percent_to_52_week_high) }}%
+                                    {% if asset.percent_to_52_week_high == 0 %} (At High)
+                                    {% elif asset.percent_to_52_week_high > 0 %} (Above High)
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td class="actions-cell">
+                                <div class="actions-dropdown">
+                                    <button type="button" class="actions-dropdown-btn" onclick="toggleActionDropdown('actions_dd_{{ asset.asset_id }}', event)">
+                                        Actions &#9662;
+                                    </button>
+                                    <div id="actions_dd_{{ asset.asset_id }}" class="actions-dropdown-content">
+                                        <a href="{{ url_for('edit_asset', asset_id=asset.asset_id) }}" class="dropdown-item">Edit Manual</a>
+                                        <form method="POST" action="{{ url_for('refresh_asset_data', asset_id=asset.asset_id) }}" class="dropdown-form">
+                                            <button type="submit" class="dropdown-item">Refresh Data</button>
+                                        </form>
+                                        <button type="button" class="dropdown-item" onclick="toggleSimForm('sell_form_{{ asset.asset_id }}'); closeAllActionDropdowns(event, 'actions_dd_{{ asset.asset_id }}');">Simulate Sell</button>
+                                        <button type="button" class="dropdown-item" onclick="toggleSimForm('buy_form_{{ asset.asset_id }}'); closeAllActionDropdowns(event, 'actions_dd_{{ asset.asset_id }}');">Simulate Buy</button>
+                                        <form method="POST" action="{{ url_for('delete_asset', asset_id=asset.asset_id) }}" class="dropdown-form">
+                                            <button type="submit" class="dropdown-item delete-item" 
+                                                    data-ticker-symbol="{{ asset.ticker_symbol | escape }}"
+                                                    onclick="return confirm('Are you sure you want to delete asset \'' + this.getAttribute('data-ticker-symbol') + '\'? This action cannot be undone.');">
+                                                Delete Asset
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td> 
+                        </tr>
+                        <tr>
+                            <td colspan="14"> 
+                                <div id="sell_form_{{ asset.asset_id }}" class="sell-simulation-form simulation-form-container" 
+                                     style="display: {% if sell_simulation_results and sell_simulation_results.asset_id == asset.asset_id %}block{% else %}none{% endif %};">
+                                    <h5>Simulate Sell for {{ asset.ticker_symbol }}</h5>
+                                    <form method="POST" action="{{ url_for('manage_account_assets', account_id=account['account_id']) }}">
+                                        <input type="hidden" name="action" value="simulate_sell">
+                                        <input type="hidden" name="simulate_sell_asset_id" value="{{ asset.asset_id }}">
+                                        <div>
+                                            <label for="sell_price_{{ asset.asset_id }}">Hypothetical Sell Price/Share:</label>
+                                            <input type="number" step="any" name="hypothetical_sale_price" id="sell_price_{{ asset.asset_id }}" required 
+                                                   value="{{ sell_simulation_results.hypothetical_sale_price if sell_simulation_results and sell_simulation_results.asset_id == asset.asset_id else '' }}">
+                                        </div>
+                                        <button type="submit">Calculate Profit</button>
+                                    </form>
+                                    {% if sell_simulation_results and sell_simulation_results.asset_id == asset.asset_id %}
+                                        <div class="simulation-result">
+                                            <p>Est. Total Proceeds: {{ sell_simulation_results.total_proceeds | currency }}</p>
+                                            <p>Original Cost: {{ sell_simulation_results.original_cost | currency }}</p>
+                                            <p><strong>Est. Profit/Loss: <span class="{% if sell_simulation_results.profit_dollars >= 0 %}profit{% else %}loss{% endif %}">{{ sell_simulation_results.profit_dollars | currency }}</span> 
+                                               ({{ "%.2f"|format(sell_simulation_results.profit_percent) }}%)</strong></p>
+                                        </div>
+                                    {% endif %}
+                                    <button type="button" class="button-link-cancel" onclick="toggleSimForm('sell_form_{{ asset.asset_id }}')" style="margin-top:10px;">Close</button> {# New Close Button #}
+                                </div>
+
+                                <div id="buy_form_{{ asset.asset_id }}" class="buy-simulation-form simulation-form-container"
+                                     style="display: {% if buy_simulation_results and buy_simulation_results.asset_id == asset.asset_id %}block{% else %}none{% endif %};">
+                                    <h5>Simulate Buy for {{ asset.ticker_symbol }} (Current Price: {{ asset.current_price | currency if asset.current_price is not none else 'N/A - Refresh Data' }})</h5>
+                                    {% if asset.current_price is not none %}
+                                    <form method="POST" action="{{ url_for('manage_account_assets', account_id=account['account_id']) }}">
+                                        <input type="hidden" name="action" value="simulate_buy_existing_asset">
+                                        <input type="hidden" name="simulate_buy_asset_id" value="{{ asset.asset_id }}">
+                                        <p style="font-size:0.9em; margin-bottom:5px;">Enter EITHER Investment Amount OR Shares to Buy:</p>
+                                        <div>
+                                            <label for="buy_investment_amount_{{ asset.asset_id }}">Investment Amount ($):</label>
+                                            <input type="number" step="any" name="buy_investment_amount" id="buy_investment_amount_{{ asset.asset_id }}" 
+                                                   placeholder="e.g., 500.00"
+                                                   value="{{ buy_simulation_inputs.investment_amount if buy_simulation_inputs and buy_simulation_inputs.asset_id == asset.asset_id else '' }}">
+                                        </div>
+                                        <div style="text-align: center; margin: 5px 0;">OR</div>
+                                        <div>
+                                            <label for="buy_shares_to_buy_{{ asset.asset_id }}">Number of Shares to Buy:</label>
+                                            <input type="number" step="any" name="buy_shares_to_buy" id="buy_shares_to_buy_{{ asset.asset_id }}" 
+                                                   placeholder="e.g., 10"
+                                                   value="{{ buy_simulation_inputs.shares_to_buy if buy_simulation_inputs and buy_simulation_inputs.asset_id == asset.asset_id else '' }}">
+                                        </div>
+                                        <button type="submit">Calculate New Position</button>
+                                    </form>
+                                    {% if buy_simulation_results and buy_simulation_results.asset_id == asset.asset_id %}
+                                    <div class="simulation-result">
+                                        <h4>Buy Simulation Results for {{ buy_simulation_results.ticker_symbol }}:</h4>
+                                        <p>Shares Purchased (approx.): {{ buy_simulation_results.shares_purchased | number_with_commas(8) }}</p>
+                                        <p>Cost of Purchase: {{ buy_simulation_results.cost_of_purchase | currency }}</p>
+                                        <hr style="margin: 5px 0;">
+                                        <p><strong>Current P/L:</strong> 
+                                            <span class="{% if buy_simulation_results.current_profit_loss_dollars >= 0 %}profit{% else %}loss{% endif %}">
+                                                {{ buy_simulation_results.current_profit_loss_dollars | currency }}
+                                            </span> 
+                                            ({{ "%.2f"|format(buy_simulation_results.current_profit_loss_percent) }}%)
+                                        </p>
+                                        <hr style="margin: 5px 0;">
+                                        <p><strong>New Total Quantity:</strong> {{ buy_simulation_results.new_total_quantity | number_with_commas(8) }}</p>
+                                        <p><strong>New Total Invested:</strong> {{ buy_simulation_results.new_total_invested | currency }}</p>
+                                        <p><strong>New Average Cost:</strong> {{ buy_simulation_results.new_average_cost | currency }}</p>
+                                        <p>New Current Value (Est.): {{ buy_simulation_results.new_current_total_value | currency }}</p>
+                                        <p><strong>New P/L (Est.): <span class="{% if buy_simulation_results.new_profit_loss_dollars >= 0 %}profit{% else %}loss{% endif %}">{{ buy_simulation_results.new_profit_loss_dollars | currency }}</span> 
+                                            ({{ "%.2f"|format(buy_simulation_results.new_profit_loss_percent) }}%)</strong></p>
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                    <p style="color: #777;">Current price not available for {{ asset.ticker_symbol }}. Please refresh asset data to use Buy Simulator.</p>
+                                {% endif %}
+                                <button type="button" class="button-link-cancel" onclick="toggleSimForm('buy_form_{{ asset.asset_id }}')" style="margin-top:10px;">Close</button> {# New Close Button #}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No assets found in this account. Add one above!</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

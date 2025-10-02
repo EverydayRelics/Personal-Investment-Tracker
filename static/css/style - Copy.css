@@ -1,0 +1,573 @@
+/* static/css/style.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+.content {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+nav {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 20px 0;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"], /* If you add email fields later */
+input[type="password"], /* If you add password fields later */
+select {
+    width: calc(100% - 22px); /* Full width minus padding and border */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Important for width calculation */
+}
+
+input[type="number"] {
+    width: auto; /* Allow number inputs to be smaller */
+}
+
+
+button[type="submit"] {
+    background-color: #5cb85c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button[type="submit"]:hover {
+    background-color: #4cae4c;
+}
+
+.button-link-refresh {
+    background-color: #5bc0de; /* Light Blue for Refresh */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #46b8da;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+.button-link-refresh:hover {
+    background-color: #31b0d5;
+}
+
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+ul {
+    list-style-type: disc; /* Default bullet points */
+    padding-left: 20px;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 1em;
+}
+.flashes li {
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    border-radius: 4px;
+}
+.flashes li.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.flashes li.error   { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.flashes li.warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.flashes li.info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+}
+
+
+
+.dashboard-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between cards */
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    flex: 1 1 200px; /* Flex properties for responsive cards */
+    min-width: 200px; /* Minimum width before wrapping */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.summary-card h4 {
+    margin-top: 0;
+    color: #555;
+    font-size: 1em;
+}
+
+.summary-card p {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 0;
+    color: #333;
+}
+
+.summary-card-total p {
+    color: #0056b3; /* Different color for overall total */
+}
+
+.profit {
+    color: #28a745 !important; /* Green for profit */
+}
+
+.loss {
+    color: #dc3545 !important; /* Red for loss */
+}
+
+
+
+.user-breakdown {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #e9ecef; /* Light grey background for user section */
+    border-radius: 8px;
+}
+
+.user-breakdown h3 {
+    margin-top: 0;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.platform-breakdown {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa; /* Slightly lighter for platform section */
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+}
+
+.platform-breakdown h4 {
+    margin-top: 0;
+    font-size: 1.1em;
+    color: #495057;
+}
+
+.dashboard-summary-platform .summary-card {
+    flex-basis: 180px; /* Slightly smaller cards for platform view if needed */
+}
+.dashboard-summary-platform .summary-card h5 {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: #6c757d;
+}
+.dashboard-summary-platform .summary-card p {
+    font-size: 1.3em;
+}
+
+.user-separator {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-color: #adb5bd;
+}
+
+/* Add to static/css/style.css */
+
+.assets-table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+    font-size: 0.9em; /* Slightly smaller font for dense table */
+}
+
+.assets-table th, .assets-table td {
+    border: 1px solid #dee2e6;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.assets-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+    white-space: nowrap; /* Prevent headers from wrapping too soon */
+}
+
+.assets-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.assets-table td {
+    /* You might want to align numbers to the right for better readability */
+    /* Example: */
+    /* &.numeric-column { text-align: right; } */
+}
+
+.button-link-simulate {
+    background-color: #007bff; /* Blue for simulate */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: inline-block; /* Or block if you want it on its own line */
+    margin-bottom: 5px;
+}
+.button-link-simulate:hover {
+    background-color: #0056b3;
+}
+.sell-simulation-form {
+    /* Styles for the div containing the simulation form and results */
+    clear: both; /* If using floats for other buttons */
+}
+.sell-simulation-form label {
+    font-size: 0.9em;
+}
+.sell-simulation-form input[type="number"] {
+    margin-bottom: 5px;
+    width: calc(100% - 12px); /* Adjust as needed */
+}
+.sell-simulation-form button[type="submit"] {
+    font-size: 0.9em;
+    padding: 6px 10px;
+}
+.simulation-result p {
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+.actions-cell button, .actions-cell .button-link-edit {
+    margin-right: 5px; /* Add some spacing between action items */
+    margin-bottom: 5px; /* Ensure vertical spacing if they wrap */
+}
+.actions-cell form {
+     margin-right: 5px; /* Spacing for forms acting as buttons */
+}
+
+.buy-calculator-form {
+    /* You can add specific styles here if needed */
+    /* For example, similar to .sell-simulation-form */
+    padding: 15px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.buy-calculator-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.buy-calculator-form input[type="text"],
+.buy-calculator-form input[type="number"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.buy-calculator-form button[type="submit"] {
+    background-color: #28a745; /* Green for buy calculate */
+}
+.buy-calculator-form button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+.button-link-simulate-buy {
+    background-color: #17a2b8; /* Teal/Info color for simulate buy */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #17a2b8;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+.button-link-simulate-buy:hover {
+    background-color: #117a8b;
+}
+
+.simulation-form-container { /* Common container style */
+    margin-top:10px; 
+    padding:10px; 
+    border:1px solid #ddd; 
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+.simulation-form-container label {
+    font-size: 0.9em;
+}
+.simulation-form-container input[type="number"] {
+    margin-bottom: 5px;
+    width: calc(100% - 12px); /* Adjust as needed */
+}
+.simulation-form-container button[type="submit"] {
+    font-size: 0.9em;
+    padding: 6px 10px;
+    margin-top: 5px;
+}
+
+.goal-form div {
+    margin-bottom: 10px;
+}
+.goal-form label {
+    display: inline-block;
+    margin-right: 10px;
+}
+.goal-form input[type="number"] {
+    padding: 8px;
+    width: 150px; /* Adjust as needed */
+}
+.goal-form button[type="submit"] {
+    padding: 8px 12px;
+}
+
+/* Add to static/css/style.css */
+
+.dashboard-goal-section {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens if needed */
+    gap: 20px;      /* Space between the two columns */
+    align-items: flex-start; /* Align items to the top */
+    margin-bottom: 20px;
+}
+
+.goal-tracker-container {
+    flex: 1 1 400px; /* Allows it to take up space, with a base of 400px */
+    min-width: 300px; /* Minimum width before it might try to shrink too much */
+}
+
+.set-goal-container {
+    flex: 1 1 300px; /* Allows it to take up space, with a base of 300px */
+    padding-left: 20px; /* Optional: add some space if columns are too close */
+    min-width: 280px;
+}
+
+.set-goal-container h2 {
+    margin-top: 0; /* Align heading with gauge heading */
+}
+
+.goal-form div {
+    margin-bottom: 10px;
+}
+.goal-form label {
+    display: block; /* Make label take full width for better alignment */
+    margin-bottom: 5px;
+}
+.goal-form input[type="number"] {
+    padding: 8px;
+    width: calc(100% - 18px); /* Adjust for padding and border */
+    box-sizing: border-box;
+}
+.goal-form button[type="submit"] {
+    padding: 8px 12px;
+    margin-top: 5px;
+}
+
+/* Responsive adjustments: On smaller screens, stack them */
+@media (max-width: 768px) {
+    .dashboard-goal-section {
+        flex-direction: column;
+    }
+    .set-goal-container {
+        padding-left: 0; /* Remove padding when stacked */
+        margin-top: 20px; /* Add some space when stacked */
+    }
+    .goal-tracker-container #goal_gauge_chart, 
+    .goal-tracker-container div[style*="width: 400px"] { /* Target the chart div specifically */
+        max-width: 100% !important; /* Allow chart to shrink */
+        width: auto !important; /* Let it be responsive */
+    }
+}
+
+/* For Best/Worst Performer Cards */
+.best-performer {
+    background-color: #e6ffed; /* Light green tint */
+    border-left: 5px solid #28a745;
+}
+.worst-performer {
+    background-color: #ffebee; /* Light red tint */
+    border-left: 5px solid #dc3545;
+}
+.best-performer p, .worst-performer p {
+    font-size: 0.9em;
+    margin: 3px 0;
+}
+.best-performer p strong, .worst-performer p strong {
+    font-size: 1.1em;
+}
+
+/* For Ranked Assets Table */
+.ranked-assets-table {
+    margin-bottom: 30px;
+}
+
+/* For Account Breakdown within Platform */
+.account-breakdown {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff; /* White background for account section */
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin-left: 20px; /* Indent account sections */
+}
+.account-breakdown h5 {
+    margin-top: 0;
+    font-size: 1em;
+    color: #343a40;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.button-link-manage-assets {
+    font-size: 0.8em;
+    padding: 4px 8px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+}
+.button-link-manage-assets:hover {
+    background-color: #5a6268;
+}
+
+/* Add to static/css/style.css */
+
+.charts-row-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow charts to wrap on smaller screens */
+    gap: 20px;      /* Space between the chart columns */
+    margin-bottom: 20px;
+}
+
+.chart-column {
+    flex: 1 1 45%; /* Each column tries to take up 45% of the space, allowing for gap */
+    min-width: 350px; /* Minimum width before wrapping */
+    /* background-color: #f9f9f9; /* Optional: for visual separation */
+    /* border: 1px solid #eee; */
+    /* border-radius: 8px; */
+    /* padding: 15px; */
+}
+
+.chart-column h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+/* Responsive adjustments for charts */
+@media (max-width: 800px) { /* Adjust breakpoint as needed */
+    .charts-row-container {
+        flex-direction: column; /* Stack charts vertically */
+    }
+    .chart-column {
+        flex-basis: auto; /* Allow them to take full width when stacked */
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+/* In static/css/style.css */
+.button-link-edit-small {
+    padding: 2px 6px;
+    font-size: 0.8em;
+    background-color: #f0ad4e;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #eea236;
+}
+.button-link-edit-small:hover {
+    background-color: #ec971f;
+}
