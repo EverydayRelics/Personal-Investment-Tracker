@@ -111,6 +111,7 @@ cd /d C:\path\to\your\Personal-Investment-Tracker
 call venv\Scripts\activate.bat
 python app.py
 pause
+```
 
 ## License
 
