@@ -113,6 +113,14 @@ python app.py
 pause
 ```
 
+## Disclaimer
+
+This application is for personal, educational, and informational purposes only. The software is provided "as is" and is not intended to be a source of financial, investment, or legal advice.
+
+The author is not liable for any financial losses, damages, or other liabilities that may occur from the use of this application. All financial decisions made by the user based on the data or calculations from this app are their sole responsibility. You should consult with a qualified financial professional before making any investment decisions.
+
+**Use this application at your own risk.**
+
 ## License
 
 This project is licensed under the MIT License.
