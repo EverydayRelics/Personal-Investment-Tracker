@@ -94,6 +94,24 @@ A simple, locally-run web application built with Python and Flask to track Canad
 5.  Use the **"Refresh Data"** buttons to get the latest market prices.
 6.  Return to the **Dashboard** to see your complete portfolio overview!
 
+## Create a .bat file (Optional Shortcut for Windows)
+
+To make starting the application easier on Windows, you can create a simple batch file.
+
+1.  Open a plain text editor (like Notepad).
+2.  Copy and paste the code below into the text file.
+3.  **Important:** Change the path on the second line (`cd /d C:\path\to\your\Personal-Investment-Tracker`) to the actual full path where you cloned the project folder.
+4.  Save the file as `start_app.bat` inside your main project folder (`Personal-Investment-Tracker`).
+
+Now, you can simply double-click `start_app.bat` to activate the environment and run the application.
+
+```batch
+@echo off
+cd /d C:\path\to\your\Personal-Investment-Tracker
+call venv\Scripts\activate.bat
+python app.py
+pause
+
 ## License
 
 This project is licensed under the MIT License.
